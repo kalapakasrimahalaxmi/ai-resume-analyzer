@@ -44,7 +44,7 @@ def calculate_ats_score(text):
 # 🤖 AI Feedback (Gemini)
 def get_ai_feedback(text):
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-1.5-pro")
 
         prompt = f"""
         You are an expert ATS resume reviewer.
