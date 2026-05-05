@@ -40,7 +40,7 @@ def calculate_ats_score(text):
 def get_ai_feedback(text):
     try:
         response = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="models/gemini-1.5-flash",
             contents=f"""
 You are an expert ATS resume reviewer.
 
