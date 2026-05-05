@@ -1,15 +1,10 @@
 import pdfplumber
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
 
-# 🔐 Get API key from Streamlit Secrets
-api_key = st.secrets.get("YOUR_GEMINI_API_KEY")
-
-if not api_key:
-    raise ValueError("❌ GEMINI_API_KEY not found in Streamlit Secrets")
-
-genai.configure(api_key=api_key)
+# 🔐 Gemini Client (NEW SDK)
+client = genai.Client(api_key=st.secrets["YOUR_GEMINI_API_KEY"])
 
 
 # 📄 Extract text from PDF
@@ -23,7 +18,7 @@ def extract_text_from_pdf(file):
     return text
 
 
-# 📊 ATS Score calculation
+# 📊 ATS Score (basic keyword logic)
 def calculate_ats_score(text):
     keywords = [
         "python", "java", "c++", "machine learning", "data science",
@@ -41,25 +36,26 @@ def calculate_ats_score(text):
     return min(score, 100)
 
 
-# 🤖 AI Feedback (Gemini)
+# 🤖 AI Feedback (Gemini - NEW SDK)
 def get_ai_feedback(text):
     try:
-        model = genai.GenerativeModel("gemini-pro")
+        response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=f"""
+You are an expert ATS resume reviewer.
 
-        prompt = f"""
-        You are an expert ATS resume reviewer.
+Analyze the resume and provide:
 
-        Analyze this resume and provide:
-        - ATS Score (0-100)
-        - Strengths
-        - Weaknesses
-        - Improvements
+1. ATS Score (0–100)
+2. Strengths
+3. Weaknesses
+4. Improvements
 
-        Resume:
-        {text}
-        """
+Resume:
+{text}
+"""
+        )
 
-        response = model.generate_content(prompt)
         return response.text
 
     except Exception as e:
