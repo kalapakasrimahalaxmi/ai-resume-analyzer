@@ -1,8 +1,10 @@
 import pdfplumber
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
-# 🔑 Replace with your Gemini API key
-genai.configure(api_key="AIzaSyDz4zzLru3CdLZ4_2BDypYVSPkwP0TaE6k")
+# Load environment variables
+load_dotenv()
 
 
 # 📄 Extract text from PDF
@@ -14,7 +16,7 @@ def extract_text_from_pdf(file):
     return text
 
 
-# 📊 Simple ATS score logic
+# 📊 ATS Score logic
 def calculate_ats_score(text):
     keywords = [
         "python", "java", "c++", "machine learning", "data science",
@@ -31,26 +33,13 @@ def calculate_ats_score(text):
     return min(score, 100)
 
 
-# 🤖 AI feedback using Gemini (FREE)
+# 🤖 AI Feedback (Gemini)
 def get_ai_feedback(text):
     try:
-        import google.generativeai as genai
+        # SAFE API KEY USAGE
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-        genai.configure(api_key="AIzaSyDz4zzLru3CdLZ4_2BDypYVSPkwP0TaE6k")
-
-        # 🔍 Automatically pick a working model
-        models = genai.list_models()
-        model_name = None
-
-        for m in models:
-            if "generateContent" in m.supported_generation_methods:
-                model_name = m.name
-                break
-
-        if not model_name:
-            return "No compatible model found."
-
-        model = genai.GenerativeModel(model_name)
+        model = genai.GenerativeModel("gemini-1.5-flash")
 
         prompt = f"""
         You are an expert resume reviewer.
